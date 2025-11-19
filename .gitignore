@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+datasets/*.csv
+models/*.h5
+models/*.keras
+*.log
+.DS_Store
+Thumbs.db
