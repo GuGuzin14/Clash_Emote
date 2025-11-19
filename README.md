@@ -159,4 +159,5 @@ Projeto educacional - Livre para uso e modificação.
 
 ## 🎓 Autor
 
-Projeto desenvolvido para demonstração de IA e reconhecimento de gestos.
+Gustavo Henrique Bispo Costa
+João Luiz Souza Pereira
