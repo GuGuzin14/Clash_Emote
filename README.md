@@ -4,7 +4,7 @@ Sistema de reconhecimento de gestos de mão em tempo real que exibe emotes do Cl
 
 ## 📋 Requisitos
 
-- Python 3.13
+- Python 3.12
 - Webcam funcional
 - Windows/Linux/Mac
 

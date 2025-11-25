@@ -7,7 +7,6 @@ env/
 venv/
 ENV/
 .venv
-datasets/*.csv
 models/*.h5
 models/*.keras
 *.log

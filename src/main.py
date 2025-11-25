@@ -10,6 +10,7 @@ import tensorflow as tf
 import pickle
 import os
 from PIL import Image
+import pygame
 
 
 class GestureRecognizer:
@@ -40,8 +41,12 @@ class GestureRecognizer:
             min_tracking_confidence=0.7
         )
         
-        # Carrega emotes
+        # Inicializa pygame mixer para áudio
+        pygame.mixer.init()
+        
+        # Carrega emotes e sons
         self.emotes = self.load_emotes()
+        self.sounds = self.load_sounds()
         
         # Controle de exibição
         self.current_gesture = None
@@ -49,6 +54,7 @@ class GestureRecognizer:
         self.show_emote = False
         self.emote_timer = 0
         self.emote_duration = 2.0  # segundos
+        self.last_played_gesture = None  # Evita tocar o mesmo som repetidamente
         
     def load_emotes(self, emotes_dir='emotes'):
         """Carrega imagens de emotes"""
@@ -71,6 +77,38 @@ class GestureRecognizer:
                     print(f"  ✓ Emote carregado: {gesture_name}")
         
         return emotes
+    
+    def load_sounds(self, sounds_dir='sounds'):
+        """Carrega arquivos de áudio dos emotes"""
+        sounds = {}
+        
+        if not os.path.exists(sounds_dir):
+            print(f"⚠ Diretório de sons não encontrado: {sounds_dir}")
+            print("  Crie a pasta 'sounds' e adicione arquivos de áudio (.mp3, .wav, .ogg)")
+            os.makedirs(sounds_dir, exist_ok=True)
+            return sounds
+        
+        for filename in os.listdir(sounds_dir):
+            if filename.endswith(('.mp3', '.wav', '.ogg')):
+                gesture_name = os.path.splitext(filename)[0]
+                sound_path = os.path.join(sounds_dir, filename)
+                
+                try:
+                    sound = pygame.mixer.Sound(sound_path)
+                    sounds[gesture_name] = sound
+                    print(f"  ✓ Som carregado: {gesture_name}")
+                except Exception as e:
+                    print(f"  ✗ Erro ao carregar som {filename}: {e}")
+        
+        return sounds
+    
+    def play_sound(self, gesture_name):
+        """Toca o som correspondente ao gesto"""
+        if gesture_name in self.sounds:
+            try:
+                self.sounds[gesture_name].play()
+            except Exception as e:
+                print(f"Erro ao tocar som {gesture_name}: {e}")
     
     def normalize_landmarks(self, landmarks):
         """Normaliza landmarks da mão"""
@@ -170,6 +208,11 @@ class GestureRecognizer:
                         if not self.show_emote:
                             self.show_emote = True
                             self.emote_timer = time.time()
+                            
+                            # Toca som se disponível e não foi o último tocado
+                            if self.current_gesture != self.last_played_gesture:
+                                self.play_sound(self.current_gesture)
+                                self.last_played_gesture = self.current_gesture
             
             # Gerencia exibição de emote
             if self.show_emote:
@@ -184,6 +227,7 @@ class GestureRecognizer:
                         frame = self.overlay_transparent(frame, emote_img, emote_x, emote_y, scale=0.5)
                 else:
                     self.show_emote = False
+                    self.last_played_gesture = None  # Reseta para permitir tocar novamente
             
             # Interface
             # Fundo para texto

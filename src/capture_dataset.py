@@ -42,6 +42,9 @@ class GestureDatasetCapture:
     
     def capture_gesture(self, gesture_name, num_samples=100):
         """Captura samples de um gesto específico"""
+        # Cria diretório datasets se não existir
+        os.makedirs('datasets', exist_ok=True)
+        
         cap = cv2.VideoCapture(0)
         
         if not cap.isOpened():
